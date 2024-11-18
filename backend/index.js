@@ -9,6 +9,7 @@ dotenv.config();
 const port = process.env.PORT;
 
 db();
+
 app.use(express.json());
 app.use("/user", router);
 app.get("/", (req, res) => {
