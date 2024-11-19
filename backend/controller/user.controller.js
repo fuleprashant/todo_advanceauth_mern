@@ -120,6 +120,8 @@ export const verifyotp = async (req, res) => {
     console.log(error);
   }
 };
+
+// login api
 export const login = async (req, res) => {
   try {
     const { email, password } = req.body;
@@ -176,6 +178,87 @@ export const login = async (req, res) => {
       email: user.email,
       token,
     });
+  } catch (error) {
+    console.log(error);
+  }
+};
+
+// forget-password api
+export const forgetpassword = async (req, res) => {
+  try {
+    const { email } = req.body;
+    const user = await userModel.findOne({ email });
+
+    if (!user) {
+      return res
+        .status(400)
+        .json({ message: "User not found with this email address" });
+    }
+
+    // generate new otp
+    const resetOTP = Math.floor(100000 + Math.random() * 900000).toString();
+    console.log("the reset otp is", resetOTP);
+
+    user.verificationOTP = resetOTP;
+    user.OTPExpire = Date.now() + 10 * 60 * 1000; // otp will exprire in 10 minutes
+    await user.save();
+
+    // send this otp to the email
+    try {
+      await emailProvider(user.email, resetOTP);
+    } catch (emailError) {
+      console.error("Error sending email OTP:", emailError);
+      // If sending email fails, return an error response
+      return responde(res, 500, "Failed to send OTP. Please try againlater.");
+    }
+    return res
+      .status(200)
+      .json({ message: "email is send to the email successfully" });
+  } catch (error) {
+    return res.status(500).json({ message: "issue in backend API" });
+  }
+};
+
+// reset password
+export const resetpassword = async (req, res) => {
+  try {
+    const { verificationOTP, newpassword } = req.body;
+
+    const errors = [];
+    if (!validator.isNumeric(verificationOTP)) {
+      errors.push("Invalid OTP format. It should contain only numbers.");
+    }
+    if (!validator.isLength(newpassword, { min: 8 })) {
+      errors.push("Password must be at least 8 characters long.");
+    }
+    if (validator.isEmpty(newpassword)) {
+      errors.push("Password cannot be empty.");
+    }
+
+    // Step 2: Return errors if validation fails
+    if (errors.length > 0) {
+      return res.status(400).json({ errors });
+    }
+
+    const user = await userModel.findOne({
+      verificationOTP,
+      OTPExpire: {
+        $gt: Date.now(),
+      },
+    });
+
+    if (!user) {
+      return res.status(400).json({ message: "Invalid or expired otp" });
+    }
+
+    const hashedPassword = await bcrypt.hash(newpassword, 15);
+    user.password = hashedPassword;
+
+    // Step 7: Save the updated user without validation errors
+    await user.save({ validateModifiedOnly: true });
+
+    // Step 8: Send success response
+    return res.status(200).json({ message: "Password reset successfully." });
   } catch (error) {
     console.log(error);
   }

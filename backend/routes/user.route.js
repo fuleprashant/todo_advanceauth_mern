@@ -1,9 +1,17 @@
 import express from "express";
-import { login, signUp, verifyotp } from "../controller/user.controller.js";
+import {
+  forgetpassword,
+  login,
+  resetpassword,
+  signUp,
+  verifyotp,
+} from "../controller/user.controller.js";
 
 const router = express.Router();
 router.post("/signup", signUp);
 router.post("/verify-otp", verifyotp);
 router.post("/login", login);
+router.post("/forget-password", forgetpassword);
+router.post("/reset-password", resetpassword);
 
 export default router;
