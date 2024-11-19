@@ -263,3 +263,13 @@ export const resetpassword = async (req, res) => {
     console.log(error);
   }
 };
+
+export const logout = (req, res) => {
+  try {
+    res.clearCookie("jwttoken");
+    return res.status(200).json({ message: "log out succefully" });
+  } catch (error) {
+    onsole.error("Error during logout:", error);
+  }
+  return res.status(500).json({ message: "something went wrong in API " });
+};

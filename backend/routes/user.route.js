@@ -2,6 +2,7 @@ import express from "express";
 import {
   forgetpassword,
   login,
+  logout,
   resetpassword,
   signUp,
   verifyotp,
@@ -13,5 +14,6 @@ router.post("/verify-otp", verifyotp);
 router.post("/login", login);
 router.post("/forget-password", forgetpassword);
 router.post("/reset-password", resetpassword);
+router.get("/logout", logout);
 
 export default router;
