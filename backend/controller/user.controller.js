@@ -3,12 +3,13 @@ import bcrypt from "bcryptjs";
 import { emailProvider } from "../utils/emailProvider.js";
 import { generateToken } from "../utils/generateToken.js";
 
+// signup API
 export const signUp = async (req, res) => {
   try {
     const { name, email, password, profileImage } = req.body;
 
     // Debug incoming request body
-    console.log("Incoming request body:", req.body);
+    // console.log("Incoming request body:", req.body);
 
     // Validate required fields
     if (!name || !email || !password) {
@@ -50,6 +51,7 @@ export const signUp = async (req, res) => {
     const token = generateToken(newUser);
     res.cookie("jwttoken", token, { maxage: 3600000 });
 
+    // console.log("ccccccccccc", cookie.req);
     return res.status(200).json({
       message: "User registered successfully",
       newUser: {
@@ -65,6 +67,35 @@ export const signUp = async (req, res) => {
   }
 };
 
+//  verification-otp API (after sign-up)
+export const verifyotp = async (req, res) => {
+  try {
+    const { verificationOTP } = req.body;
+    const user = await userModel.findOne({ verificationOTP });
+    console.log(user.verificationOTP);
+
+    if (!user) {
+      return res.status(400).json({ message: "Invalid message" });
+    }
+
+    if (user.OTPExpire < Date.now()) {
+      return res.status(400).json({ message: "Otp is expire" });
+    }
+
+    user.isVerified = true;
+    await user.save();
+
+    return res.status(200).json({
+      message: " email verified successfully",
+      id: user._id,
+      name: user.name,
+      email: user.email,
+      isVerified: user.isVerified,
+    });
+  } catch (error) {
+    console.log(error);
+  }
+};
 export const login = (req, res) => {
   console.log("the login function is clicked");
   res.send("the login is clicked");
