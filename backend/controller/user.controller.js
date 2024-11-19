@@ -1,6 +1,7 @@
 import userModel from "../model/user.model.js";
 import bcrypt from "bcryptjs";
 import { emailProvider } from "../utils/emailProvider.js";
+import { generateToken } from "../utils/generateToken.js";
 
 export const signUp = async (req, res) => {
   try {
@@ -46,12 +47,16 @@ export const signUp = async (req, res) => {
 
     await emailProvider(newUser.email, verificationOTP);
 
+    const token = generateToken(newUser);
+    res.cookie("jwttoken", token, { maxage: 3600000 });
+
     return res.status(200).json({
       message: "User registered successfully",
       newUser: {
         name: newUser.name,
         email: newUser.email,
         isVerified: false,
+        token,
       },
     });
   } catch (error) {

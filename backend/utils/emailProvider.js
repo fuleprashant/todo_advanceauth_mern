@@ -1,4 +1,7 @@
 import nodemailer from "nodemailer";
+import dotenv from "dotenv";
+
+dotenv.config();
 
 // Create a transporter
 const transporter = nodemailer.createTransport({
@@ -16,7 +19,7 @@ export const emailProvider = async (email, otp) => {
       to: email,
       subject: "Your email verification OTP is",
       text: `your otp is ${otp}. it will expire in 10 minites`,
-      html: <b>your otp is ${otp}. it will expire in 10 minites</b>,
+      html: `<b>your otp is ${otp}. it will expire in 10 minites</b>`,
     });
 
     console.log("Message sent: %s", info.messageId);
