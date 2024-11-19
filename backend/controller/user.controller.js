@@ -1,5 +1,6 @@
 import userModel from "../model/user.model.js";
 import bcrypt from "bcryptjs";
+import { emailProvider } from "../utils/emailProvider.js";
 
 export const signUp = async (req, res) => {
   try {
@@ -42,6 +43,8 @@ export const signUp = async (req, res) => {
     });
 
     await newUser.save();
+
+    await emailProvider(newUser.email, verificationOTP);
 
     return res.status(200).json({
       message: "User registered successfully",
