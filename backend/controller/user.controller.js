@@ -264,7 +264,7 @@ export const resetpassword = async (req, res) => {
   }
 };
 
-// logout 
+// logout
 export const logout = (req, res) => {
   try {
     res.clearCookie("jwttoken");
@@ -273,4 +273,29 @@ export const logout = (req, res) => {
     onsole.error("Error during logout:", error);
   }
   return res.status(500).json({ message: "something went wrong in API" });
+};
+
+// get single used data
+export const singleUserProfile = async () => {
+  try {
+    const userId = req.params.id;
+
+    if (!userId) {
+      return res.status(400).json({ message: "User id is required" });
+    }
+
+    const user = await userModel.findById(userId);
+
+    // check that is user is exist or not
+    if (!user) {
+      return res.status(400).json({ message: "user is not found" });
+    }
+
+    return res.status(200).json({ message: "user profile fethed succesfully" });
+  } catch (error) {
+    console.log("the error is", error);
+    return res
+      .status(500)
+      .json({ message: "the backend problem , something went wrong" });
+  }
 };
