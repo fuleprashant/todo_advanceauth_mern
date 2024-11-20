@@ -1,4 +1,8 @@
 import { createSlice } from "@reduxjs/toolkit";
+import Cookies from "universal-cookie";
+
+const cookie = new Cookies();
+const token = cookie.get("jwttoken");
 
 const initialState = {
   user: null,
