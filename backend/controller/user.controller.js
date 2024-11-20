@@ -264,6 +264,7 @@ export const resetpassword = async (req, res) => {
   }
 };
 
+// logout 
 export const logout = (req, res) => {
   try {
     res.clearCookie("jwttoken");
@@ -271,5 +272,5 @@ export const logout = (req, res) => {
   } catch (error) {
     onsole.error("Error during logout:", error);
   }
-  return res.status(500).json({ message: "something went wrong in API " });
+  return res.status(500).json({ message: "something went wrong in API" });
 };
