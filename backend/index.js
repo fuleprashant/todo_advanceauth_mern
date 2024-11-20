@@ -1,11 +1,19 @@
 import express from "express";
 import dotenv from "dotenv";
+import db from "./database/db.js";
+import router from "./routes/user.route.js";
+import cookieParser from "cookie-parser";
 
 const app = express();
 // console.log("this is starting of application");
 dotenv.config();
 const port = process.env.PORT;
 
+db();
+
+app.use(express.json());
+app.use(cookieParser());
+app.use("/user", router);
 app.get("/", (req, res) => {
   res.send("the server has been started");
 });
