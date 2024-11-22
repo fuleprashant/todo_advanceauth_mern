@@ -7,10 +7,15 @@ import { NavLink } from "react-router-dom";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
+import { useDispatch } from "react-redux";
+import authRequest from "../../redux/authSlice";
+import { signUpUser } from "../../services/auth.services";
+import { toast } from "react-toastify";
 
 const Login = () => {
   const [isSignUp, setIsSignUp] = useState(false);
   const [showpassword, setShowpassword] = useState(false);
+  const dispatch = useDispatch();
 
   const signInSchema = yup.object().shape({
     email: yup
@@ -49,8 +54,18 @@ const Login = () => {
     resolver: yupResolver(isSignUp ? signUpSchema : signInSchema),
   });
 
-  const onSubmit = (data) => {
-    console.log("Form Data:", data);
+  const onSubmit = async (data) => {
+    // console.log("Form Data:", data);
+    // dispatch(authRequest());
+    try {
+      if (isSignUp) {
+        const result = await signUpUser(data);
+        console.log("the result is", result);
+        toast.success(result.message);
+      }
+    } catch (error) {
+      console.log(error);
+    }
   };
 
   return (

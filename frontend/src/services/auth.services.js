@@ -1,5 +1,4 @@
-import { useDispatch } from "react-redux";
-import { authRequest } from "../redux/authSlice";
+import { authFailure, authRequest, authSuccess } from "../redux/authSlice";
 import axiosInstance from "./axios";
 import {
   forgotpassword,
@@ -9,23 +8,34 @@ import {
   signUp,
   verifyotp,
 } from "./apiconstant";
+import { store } from "../redux/store";
 
-const dispatch = useDispatch();
+const dispatch = store.dispatch;
 
 // sign-up api calling
 export const signUpUser = async (userData) => {
-  dispatch(authRequest);
+  dispatch(authRequest());
   try {
-    const response = await axiosInstance.post(signUp, userData);
-    console.log(response);
+    const headers = {
+      "Content-Type": "application/json",
+      USER_API_KEY: import.meta.env.API_KEY,
+    };
+    // console.log(signUp);
+    const response = await axiosInstance.post(signUp, userData, { headers });
+    console.log("the response is", response);
+    dispatch(authSuccess(response.data.newUser));
+    return response.data;
   } catch (error) {
-    console.log(error);
+    // console.log(error);
+    console.log("the error is", error);
+    dispatch(authFailure(error));
+    throw error.response.data;
   }
 };
 
 // login api calling
 export const logInUser = async (userData) => {
-  dispatch(authRequest);
+  dispatch(authRequest());
   try {
     const response = await axiosInstance.post(logIn, userData);
     console.log(response);
